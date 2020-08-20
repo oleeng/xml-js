@@ -47,10 +47,20 @@ class Element {
   }
 
   addChild(node){
+    if(this._data.tag == "xml-js-text-field"){
+      // text feld
+      return null
+    }
     if(node instanceof Node){
       node._data.parent = this
       this._data.children.push(node)
       return node
+    }else if(typeof node == "string"){
+      let n = new Node("xml-js-text-field")
+      n.addAttribute("textContent", node)
+      n._data.parent = this
+      this._data.children.push(node)
+      return n
     }
     return null
   }
@@ -68,6 +78,49 @@ class Element {
 
   get parent(){
     return this._data.parent;
+  }
+
+  export(){
+    let xml = ""
+
+    xml += createHeader(this._data)
+
+    xml += createContent(this._data.children)
+
+    return xml
+
+    function createHeader(header){
+      let hString = ""
+      hString += "<?"+header.tag
+      for(const a in header.attributes){
+        hString += " "+a+"=\""+header.attributes[a]+"\""
+      }
+      hString += "?>"
+      return hString
+    }
+
+    function createContent(content){
+      let cString = ""
+      for(const c in content){
+        if(content[c].tag == "xml-js-text-field"){
+          // text node
+          cString += content[c]._data.attributes["textContent"]
+          continue
+        }
+        cString += "<"+content[c].tag
+        for(const a in content[c].attributes){
+          cString += " "+a+"=\""+content[c].attributes[a]+"\""
+        }
+        if(content[c].children.length == 0){
+          cString += "/>"
+        }else{
+          cString += ">"
+          cString += createContent(content[c].children)
+          cString += "</"+content[c].tag+">"
+        }
+      }
+      return cString
+    }
   }
 }
 
@@ -92,16 +145,3 @@ class XMLContainer extends Element {
     return null
   }
 }
-
-/*
-var n = new XMLContainer()
-var t = n.addChild(new Node("a"))
-t.addChild(new Node("b"))
-
-t.remove()
-n.removeChild(t)
-
-
-console.log(n);
-console.log(n.lastChild);
-*/
