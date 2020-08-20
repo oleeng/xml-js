@@ -59,7 +59,7 @@ class Element {
       let n = new Node("xml-js-text-field")
       n.addAttribute("textContent", node)
       n._data.parent = this
-      this._data.children.push(node)
+      this._data.children.push(n)
       return n
     }
     return null
