@@ -81,6 +81,10 @@ class Element {
   }
 
   export(){
+    if(this.constructor != XMLContainer){
+      console.log("export nur auf den XMLContainer anwendbar...");
+      return ;
+    }
     let xml = ""
 
     xml += createHeader(this._data)
